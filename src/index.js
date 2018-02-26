@@ -9,6 +9,10 @@ import reducers from './reducers';
 
 const createStoreWithMiddleware = applyMiddleware()(createStore);
 
+class Default extends React.Component {
+  render() { return <div>Go to /hello or /goodbye routes</div> }
+}
+
 class Hello extends React.Component {
   render() { return <div>Hello!</div> }
 }
@@ -21,8 +25,10 @@ ReactDOM.render(
   <Provider store={createStoreWithMiddleware(reducers)}>
     <BrowserRouter>
     <div>
+      Header
      <Route path="/hello" component={Hello}/>
      <Route path="/goodbye" component={Goodbye}/>
+     <Route path="/" component={Default}/>
     </div>
     </BrowserRouter>
 
