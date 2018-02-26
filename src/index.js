@@ -22,7 +22,7 @@ ReactDOM.render(
     <BrowserRouter>
     <div>
      <Route path="/hello" component={Hello}/>
-     <Route path="goodbye" component={Goodbye}/>
+     <Route path="/goodbye" component={Goodbye}/>
     </div>
     </BrowserRouter>
 
