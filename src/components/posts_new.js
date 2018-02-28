@@ -2,10 +2,30 @@ import React, { Component } from 'react';
 import { Field, reduxForm } from 'redux-form'; // reduxForm func helper - this is v similar to the connect helper from the react-redux library. We use this to wrap the PostsNew component. By doing so, we gave it the ability to communicate directly from this component to the reducer that we wired up earlier ({form: formsReducer} in reducers/index.js)
 
 class PostsNew extends Component {
-    renderTitleField(field) { // field arg conains an event handler for making sure that the Field component below is responsible for dealing with this particular text input
+    // renderTitleField(field) { // field arg conains an event handler for making sure that the Field component below is responsible for dealing with this particular text input
+    //     return (
+    //         <div className="form-group">
+    //         <label>Title</label>
+    //             <input
+    //               className="form-control"
+    //               type="text"
+    //               {...field.input}  // wires this input to below input; takes all of the properties in the field.input object, adds them as props on the input tag. it saves us from having to write:
+    //                 // onChange={field.input.onChage}
+    //                 // onChange={field.input.onChage}
+    //                 // onChange={field.input.onChage}
+    //             />
+    //             </div>
+    //     );
+    // }
+
+    renderField(field) { // field arg conains an event handler for making sure that the Field component below is responsible for dealing with this particular text input
         return (
             <div className="form-group">
-            <label>Title</label>
+            {/* <label>Title</label> */}
+            {/* we can replace the hardcoded Title label with the field.label variable defined below in the Field component */}
+            <label>{field.label}</label> 
+
+
                 <input
                   className="form-control"
                   type="text"
@@ -14,44 +34,64 @@ class PostsNew extends Component {
                     // onChange={field.input.onChage}
                     // onChange={field.input.onChage}
                 />
+                {field.meta.error} 
+                {/* this meta property is automatically added to the field object from our validate function below */}
                 </div>
         );
     }
 
-    renderTitleField(field) { // field arg conains an event handler for making sure that the Field component below is responsible for dealing with this particular text input
-        return (
-            <div className="form-group">
-            <label>Title</label>
-                <input
-                  className="form-control"
-                  type="text"
-                  {...field.input}  // wires this input to below input; takes all of the properties in the field.input object, adds them as props on the input tag. it saves us from having to write:
-                    // onChange={field.input.onChage}
-                    // onChange={field.input.onChage}
-                    // onChange={field.input.onChage}
-                />
-                </div>
-        );
-    }
-    
     render() {
+        const { handleSubmit } = this.props;
         return (
+           
             // 1. to use field component in redux, first create a vanilla html form.
 
-<form>  
+<form onSubmit={handleSubmit()}>  
     {/* 2. next, create a field component, and pass it a few props (name prop, component prop) what piece of state will the user be editing */}
     <Field 
     // 3. the first field will be responsible for the title that the user wants to enter for a blog post
+      label="Title"
       name="title" 
     //   4. component property takes a func or another component that will be used to display this Field component above. Important note: the Field component abstracts away all the redux wiring, event emitters etc that we don't care about. the component={} is where we add all the view stuff that the user is going to see. Here, we are putting it in a function called this.renderTitleField. Note that it's a func reference, not a call.
-      component={this.renderTitleField}
+      component={this.renderField}
     />
+    <Field 
+      label="Categories"
+      name="categories"
+      component={this.renderField}
+      />/
+
+      <Field 
+        label="Post Content"
+        name="content"
+        component={this.renderField}
+        />
+        <button type="submit" className="btn btn-primary">Submit</button>
     </form>
             )
     }
 }
 
+function validate(values) {  // validate func is given a param called values, which includes all the values a user has entered inside the form
+    const errors = {}; // first, create errors obj. if we return an empty obj, redux-form assumes there is nothing wrong with our form
+
+    // validate inputs from 'values' obj
+
+    if (values.title && values.title.length < 3) {
+        errors.title = "Title must be at least 3 chars";
+    }
+
+    if (!values.title) {
+        errors.title = "Enter a title";
+    }
+
+    return errors; // if errors is empty, the form is fine to submit
+
+}
 
 export default reduxForm({
+    // validate: validate,
+    // or, using es6 shorthand:
+    validate,  // the validate func will be called automatically at various points during the form's lifecycle. most notably, whenever the user tries to submit the form
     form: 'PostsNewForm'  // think of this as the name of the form - each form takes a string as a unique name. specifies the namespace for all the state that is going to be generated by this particular component
 })(PostsNew);
